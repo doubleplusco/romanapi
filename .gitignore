@@ -1,3 +1,10 @@
+# project specific
+bak/
+cert/
+deploy/
+notes/
+preso/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
