@@ -33,11 +33,7 @@ def convert (value, context):
         logger.info("received input: '%s'" % value)
 
         # input comes in as a string with potential spaces
-        # numeral = numeral.strip()
-        # input comes in as a dictionary with potential spaces
-        #numeral = value["numeral"].strip()
         numeral = value.strip()
-        # numeral = value["value"].strip()
 
         # reject invalid which are not handled by the library
         if numeral in [None, "", "0"] or numeral.startswith("-"):
