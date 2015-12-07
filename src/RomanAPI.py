@@ -30,7 +30,6 @@ def convert (value, context):
     arabic = roman = error = None
 
     try:
-        # logging.info("Received input: '%s'" % value)
         logger.info("received input: '%s'" % value)
 
         # input comes in as a string with potential spaces
@@ -46,13 +45,11 @@ def convert (value, context):
         else:
             # first, assume the numeral is arabic
             try:
-                # logging.info("Attempting to cast numeral to integer")
                 logger.info({"message": "Attempting to cast numeral to integer"})
                 arabic = int(numeral)
 
                 # so far so good, assume this is an arabic numeral
                 try:
-                    # logging.info("Attempting to convert numeral from Arabic to Roman")
                     logger.info({"message": "attempting to convert numeral from arabic to roman"})
                     roman = "%s" % romanify.arabic2roman(arabic)
                 except ValueError as e:
@@ -62,7 +59,6 @@ def convert (value, context):
             # failing that, assume the numeral is roman
             except:
                 try:
-                    # logging.info("Attempting to convert numeral from Roman to Arabic")
                     logger.info({"message": "attempting to convert numeral from roman to arabic"})
                     roman = numeral
 
@@ -78,10 +74,8 @@ def convert (value, context):
         if error is None:
             response = { "success": True, "arabic": arabic, "roman": roman}
         else:
-            # response = { "success": False, "message": error }
-            response = { "success": False, "message": error, "input": value }
+            response = { "success": False, "message": error }
 
-        # logging.info(response)
         logger.info(json.dumps(response))
         return response
 
