@@ -1,0 +1,95 @@
+{
+	"swagger": "2.0",
+	"info": {
+		"description": "A microservice to convert Roman numerals to Arabic and vice versa",
+		"version": "1.0.0",
+		"title": "Roman API",
+		"contact": {},
+		"license": {
+			"name": "Apache 2.0",
+			"url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+		}
+	},
+	"host": "romanapi.com:443",
+	"tags": [
+		{
+			"name": "Default",
+			"description": "Default section"
+		}
+	],
+	"schemes": [
+		"https"
+	],
+	"paths": {
+		"/numeral/{value}": {
+			"get": {
+				"tags": [
+					"Default"
+				],
+				"operationId": "getNumeralValue",
+				"consumes": [],
+				"produces": [
+					"application/json",
+					"text/plain"
+				],
+				"parameters": [
+					{
+						"name": "value",
+						"in": "path",
+						"description": "The value of the Arabic or Roman numeral",
+						"required": true,
+						"type": "string"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/result"
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"schema": {
+							"$ref": "#/definitions/error"
+						}
+					}
+				}
+			}
+		}
+	},
+	"definitions": {
+		"result": {
+			"properties": {
+				"roman": {
+					"type": "string",
+					"description": "The Roman numeral"
+				},
+				"success": {
+					"type": "boolean",
+					"description": "The conversion status (true)",
+					"default": false
+				},
+				"arabic": {
+					"type": "string",
+					"description": "The Arabic numeral"
+				}
+			},
+			"description": "The converted numeral"
+		},
+		"error": {
+			"properties": {
+				"success": {
+					"type": "boolean",
+					"description": "The conversion status (false)",
+					"default": false
+				},
+				"message": {
+					"type": "string",
+					"description": "The error message"
+				}
+			},
+			"description": "The conversion error"
+		}
+	}
+}
