@@ -4,7 +4,15 @@ import json
 
 def convert (value, context):
     # log in json format for easy ingestion in log management tools
-    FORMAT = '{"@timestamp":"%(asctime)s","level":"%(levelname)s","aws_request_id":"' + context.aws_request_id + '","message":"%(message)s"}'
+    FORMAT = '{'
+    FORMAT += '"@timestamp":"%(asctime)s","level":"%(levelname)s","message":"%(message)s"'
+    FORMAT += ',"aws_request_id":"' + context.aws_request_id + '"'
+    FORMAT += ',"function_version":"' + context.function_version + '"'
+    FORMAT += ',"function_arn":"' + context.invoked_function_arn + '"'
+    FORMAT += ',"log_group_name":"' + context.log_group_name + '"'
+    FORMAT += ',"log_stream_name":"' + context.log_stream_name + '"'
+    FORMAT += '}'
+
     # set the date format to ISO 8601
     DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
@@ -27,7 +35,7 @@ def convert (value, context):
     logger.addHandler(ch)
 
     # initialise defaults
-    arabic = roman = error = None
+    arabic = roman = result = error = None
 
     try:
         logger.info("received input: '%s'" % value)
@@ -47,7 +55,7 @@ def convert (value, context):
                 # so far so good, assume this is an arabic numeral
                 try:
                     logger.info({"message": "attempting to convert numeral from arabic to roman"})
-                    roman = "%s" % romanify.arabic2roman(arabic)
+                    result = roman = "%s" % romanify.arabic2roman(arabic)
                 except ValueError as e:
                     # something went wrong, log the error and assume this a roman numeral
                     error = "invalid numeral: %s" % e
@@ -58,7 +66,7 @@ def convert (value, context):
                     logger.info({"message": "attempting to convert numeral from roman to arabic"})
                     roman = numeral
 
-                    arabic = romanify.roman2arabic(numeral)
+                    result = arabic = romanify.roman2arabic(numeral)
                 except ValueError as e:
                     # ok, the numeral is neither valid arabic nor roman
                     error = "invalid numeral: %s" % e
@@ -67,13 +75,13 @@ def convert (value, context):
     except Exception as e:
         error = str(e)
     finally:
-        if error is None:
-            response = { "success": True, "arabic": arabic, "roman": roman}
+        if error is not None:
+            raise Exception(error)
         else:
-            response = { "success": False, "message": error }
+            response = { "success": True, "arabic": arabic, "roman": roman, "original": numeral, "result": result }
+            return response
 
         logger.info(json.dumps(response))
-        return response
 
 # need this for local testing
 if __name__ == "__main__":
@@ -81,7 +89,11 @@ if __name__ == "__main__":
 
     # mock aws context object
     class MockContext(object):
-        aws_request_id = "mock_123456"
+        aws_request_id = "12345"
+        function_version = "50"
+        invoked_function_arn = "function:roman_api_convert"
+        log_group_name = "log_group"
+        log_stream_name = "log_stream"
 
     mock_context = MockContext()
 
