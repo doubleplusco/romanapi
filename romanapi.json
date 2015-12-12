@@ -11,6 +11,7 @@
 		}
 	},
 	"host": "romanapi.com:443",
+	"basePath": "/v1",
 	"tags": [
 		{
 			"name": "Default",
@@ -71,8 +72,17 @@
 					"default": false
 				},
 				"arabic": {
-					"type": "string",
+					"type": "integer",
+					"format": "int32",
 					"description": "The Arabic numeral"
+				},
+				"result": {
+					"type": "string",
+					"description": "The conversion result"
+				},
+				"original": {
+					"type": "string",
+					"description": "The original numeral input"
 				}
 			},
 			"description": "The converted numeral"
@@ -84,7 +94,7 @@
 					"description": "The conversion status (false)",
 					"default": false
 				},
-				"message": {
+				"errorMessage": {
 					"type": "string",
 					"description": "The error message"
 				}
