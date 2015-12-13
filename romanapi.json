@@ -1,105 +1,207 @@
 {
-	"swagger": "2.0",
-	"info": {
-		"description": "A microservice to convert Roman numerals to Arabic and vice versa",
-		"version": "1.0.0",
-		"title": "Roman API",
-		"contact": {},
-		"license": {
-			"name": "Apache 2.0",
-			"url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-		}
-	},
-	"host": "romanapi.com:443",
-	"basePath": "/v1",
-	"tags": [
-		{
-			"name": "Default",
-			"description": "Default section"
-		}
-	],
-	"schemes": [
-		"https"
-	],
-	"paths": {
-		"/numeral/{value}": {
-			"get": {
-				"tags": [
-					"Default"
-				],
-				"operationId": "getNumeralValue",
-				"consumes": [],
-				"produces": [
-					"application/json",
-					"text/plain"
-				],
-				"parameters": [
-					{
-						"name": "value",
-						"in": "path",
-						"description": "The value of the Arabic or Roman numeral",
-						"required": true,
-						"type": "string"
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/result"
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"schema": {
-							"$ref": "#/definitions/error"
-						}
-					}
-				}
-			}
-		}
-	},
-	"definitions": {
-		"result": {
-			"properties": {
-				"roman": {
-					"type": "string",
-					"description": "The Roman numeral"
-				},
-				"success": {
-					"type": "boolean",
-					"description": "The conversion status (true)",
-					"default": false
-				},
-				"arabic": {
-					"type": "integer",
-					"format": "int32",
-					"description": "The Arabic numeral"
-				},
-				"result": {
-					"type": "string",
-					"description": "The conversion result"
-				},
-				"original": {
-					"type": "string",
-					"description": "The original numeral input"
-				}
-			},
-			"description": "The converted numeral"
-		},
-		"error": {
-			"properties": {
-				"success": {
-					"type": "boolean",
-					"description": "The conversion status (false)",
-					"default": false
-				},
-				"errorMessage": {
-					"type": "string",
-					"description": "The error message"
-				}
-			},
-			"description": "The conversion error"
-		}
-	}
+    "swagger": "2.0",
+        "info": {
+            "description": "A microservice to convert Roman numerals to Arabic and vice versa",
+            "version": "1.0.0",
+            "title": "Roman API",
+            "contact": {},
+            "license": {
+                "name": "Apache 2.0",
+                "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+            }
+        },
+        "host": "romanapi.com:443",
+        "tags": [
+        {
+            "name": "Conversion",
+            "description": "Conversion section"
+        }
+        ],
+        "schemes": [
+            "https"
+            ],
+        "paths": {
+            "/numeral/{value}": {
+                "get": {
+                    "summary": "Numeral conversion",
+                    "description": "Converts numerals from Roman <> Arabic",
+                    "tags": [
+                        "Conversion"
+                        ],
+                    "operationId": "getNumeralValue",
+                    "consumes": [],
+                    "produces": [
+                        "application/json"
+                        ],
+                    "parameters": [
+                    {
+                        "name": "value",
+                        "in": "path",
+                        "description": "The value of the Arabic or Roman numeral",
+                        "required": true,
+                        "type": "string"
+                    }
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "OK",
+                            "schema": {
+                                "$ref": "#/definitions/result"
+                            },
+                            "headers": {
+                                "Access-Control-Allow-Headers": {
+                                    "type": "string"
+                                },
+                                "Access-Control-Allow-Methods": {
+                                    "type": "string"
+                                },
+                                "Access-Control-Allow-Origin": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "400": {
+                            "description": "Bad Request",
+                            "schema": {
+                                "$ref": "#/definitions/error"
+                            },
+                            "headers": {
+                                "Access-Control-Allow-Headers": {
+                                    "type": "string"
+                                },
+                                "Access-Control-Allow-Methods": {
+                                    "type": "string"
+                                },
+                                "Access-Control-Allow-Origin": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "x-amazon-apigateway-integration": {
+                        "type": "aws",
+                        "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:956618040296:function:roman_api_convert:v1/invocations",
+                        "httpMethod": "POST",
+                        "requestTemplates" : {
+                           "application/json" : "\"$input.params('value')\""
+                        },
+                        "responses": {
+                            "default": {
+                                "statusCode": "200",
+                                "responseParameters": {
+                                    "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
+                                    "method.response.header.Access-Control-Allow-Methods": "'*'",
+                                    "method.response.header.Access-Control-Allow-Origin": "'*'"
+                                },
+                                "responseTemplates": {
+                                	"application/json": null
+                                }
+                            },
+                            "invalid numeral.*": {
+                                "statusCode": "400",
+                                "responseParameters": {
+                                    "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
+                                    "method.response.header.Access-Control-Allow-Methods": "'*'",
+                                    "method.response.header.Access-Control-Allow-Origin": "'*'"
+                                },
+                                "responseTemplates": {
+                                    "application/json": "{ \"success\": false, \"errorMessage\": \"$input.path('$').errorMessage\" }"
+                                }
+                            }
+                        }
+                    }
+                },
+                "options": {
+                    "summary": "CORS support",
+                    "description": "Enables CORS by returning correct headers",
+                    "tags": [
+                        "Conversion"
+                        ],
+                    "consumes": [
+                        "application/json"
+                        ],
+                    "produces": [
+                        "application/json"
+                        ],
+                    "responses": {
+                        "200": {
+                            "description": "OK",
+                            "headers": {
+                                "Access-Control-Allow-Headers": {
+                                    "type": "string"
+                                },
+                                "Access-Control-Allow-Methods": {
+                                    "type": "string"
+                                },
+                                "Access-Control-Allow-Origin": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "x-amazon-apigateway-integration": {
+                        "type": "mock",
+                        "requestTemplates": {
+                               "application/json": "{ \"statusCode\": 200 }"
+                           },
+                        "responses": {
+                            "default": {
+                                "statusCode": "200",
+                                "responseParameters": {
+                                    "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
+                                    "method.response.header.Access-Control-Allow-Methods": "'*'",
+                                    "method.response.header.Access-Control-Allow-Origin": "'*'"
+                                },
+                                "responseTemplates": {
+                                      "application/json": "{ }"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "definitions": {
+            "result": {
+                "properties": {
+                    "roman": {
+                        "type": "string",
+                        "description": "The Roman numeral"
+                    },
+                    "success": {
+                        "type": "boolean",
+                        "description": "The conversion status (true)",
+                        "default": false
+                    },
+                    "arabic": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "The Arabic numeral"
+                    },
+                    "result": {
+                        "type": "string",
+                        "description": "The conversion result"
+                    },
+                    "original": {
+                        "type": "string",
+                        "description": "The original numeral input"
+                    }
+                },
+                "description": "The converted numeral"
+            },
+            "error": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "description": "The conversion status (false)",
+                        "default": false
+                    },
+                    "errorMessage": {
+                        "type": "string",
+                        "description": "The error message"
+                    }
+                },
+                "description": "The conversion error"
+            }
+        }
 }
